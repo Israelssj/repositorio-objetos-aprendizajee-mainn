@@ -16,10 +16,7 @@ public class Evaluacion {
     @Column(name = "comentario", columnDefinition = "TEXT")
     private String comentario;
 
-    @OneToOne(mappedBy = "evaluacion", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private Descarga descarga;
-
+    // Relación bidireccional con ObjetoAprendizaje
     @OneToOne(mappedBy = "evaluacion", cascade = CascadeType.ALL)
     @JsonIgnore
     private ObjetoAprendizaje objetoAprendizaje;
@@ -57,14 +54,6 @@ public class Evaluacion {
 
     public void setComentario(String comentario) {
         this.comentario = comentario;
-    }
-
-    public Descarga getDescarga() {
-        return descarga;
-    }
-
-    public void setDescarga(Descarga descarga) {
-        this.descarga = descarga;
     }
 
     public ObjetoAprendizaje getObjetoAprendizaje() {

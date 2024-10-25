@@ -8,6 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
@@ -29,28 +33,27 @@ public class ObjetoAprendizajeController {
         return objetoAprendizajeRepository.findAll();
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<ObjetoAprendizaje> getObjetoAprendizajeById(@PathVariable Integer id) {
         Optional<ObjetoAprendizaje> objetoAprendizaje = objetoAprendizajeRepository.findById(id);
         return objetoAprendizaje.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
     @PostMapping(value = "/", consumes = {"multipart/form-data"})
     public ResponseEntity<ObjetoAprendizaje> createObjetoAprendizaje(@RequestParam("file") MultipartFile file) {
         try {
-
-            String fileName = file.getOriginalFilename();
-
+            String directoryPath = "C:\\Users\\Administrator\\Documents\\ObjetosDeAprendizaje";
+            String filePath = directoryPath + File.separator + file.getOriginalFilename();
+            File destinationFile = new File(filePath);
+            file.transferTo(destinationFile); // Almacena el archivo en el directorio
 
             ObjetoAprendizaje objetoAprendizaje = new ObjetoAprendizaje();
-            objetoAprendizaje.setArchivo(fileName);
+            objetoAprendizaje.setArchivo(file.getOriginalFilename());
             objetoAprendizaje.setFecha(new Date(System.currentTimeMillis()));
 
             ObjetoAprendizaje savedObjetoAprendizaje = objetoAprendizajeRepository.save(objetoAprendizaje);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedObjetoAprendizaje);
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
