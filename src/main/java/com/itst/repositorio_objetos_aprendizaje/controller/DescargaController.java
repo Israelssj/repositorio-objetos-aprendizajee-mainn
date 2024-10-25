@@ -34,7 +34,7 @@ public class DescargaController {
             return ResponseEntity.notFound().build();
         }
         try {
-            // Asume que 'archivo' es el campo que guarda el nombre del archivo
+
             Path path = Paths.get("ruta/donde/se/guardan/los/archivos/" + objeto.getArchivo());
             byte[] data = Files.readAllBytes(path);
             return ResponseEntity.ok()
