@@ -1,7 +1,6 @@
 package com.itst.repositorio_objetos_aprendizaje.model;
 
 import jakarta.persistence.*;
-import java.sql.Date;
 import java.util.List;
 
 @Entity
@@ -16,7 +15,7 @@ public class ObjetoAprendizaje {
     private String archivo;
 
     @Column(name = "fecha", nullable = false)
-    private Date fecha;
+    private java.sql.Date fecha;
 
     @ManyToOne
     @JoinColumn(name = "idGuion")
@@ -29,15 +28,17 @@ public class ObjetoAprendizaje {
     @JoinColumn(name = "idEvaluacion")
     private Evaluacion evaluacion;
 
+    // Constructores
     public ObjetoAprendizaje() {
         // Constructor vacío necesario para JPA
     }
 
-    public ObjetoAprendizaje(String archivo, Date fecha) {
+    public ObjetoAprendizaje(String archivo, java.sql.Date fecha) {
         this.archivo = archivo;
         this.fecha = fecha;
     }
 
+    // Getters y Setters
     public Integer getIdObjetoAprendizaje() {
         return idObjetoAprendizaje;
     }
@@ -54,11 +55,11 @@ public class ObjetoAprendizaje {
         this.archivo = archivo;
     }
 
-    public Date getFecha() {
+    public java.sql.Date getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(java.sql.Date fecha) {
         this.fecha = fecha;
     }
 

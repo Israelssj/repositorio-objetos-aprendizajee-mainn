@@ -3,15 +3,15 @@ package com.itst.repositorio_objetos_aprendizaje.controller;
 import com.itst.repositorio_objetos_aprendizaje.model.ObjetoAprendizaje;
 import com.itst.repositorio_objetos_aprendizaje.repository.ObjetoAprendizajeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
@@ -42,21 +42,41 @@ public class ObjetoAprendizajeController {
     @PostMapping(value = "/", consumes = {"multipart/form-data"})
     public ResponseEntity<ObjetoAprendizaje> createObjetoAprendizaje(@RequestParam("file") MultipartFile file) {
         try {
+            String fileName = file.getOriginalFilename();
             String directoryPath = "C:\\Users\\Administrator\\Documents\\ObjetosDeAprendizaje";
-            String filePath = directoryPath + File.separator + file.getOriginalFilename();
-            File destinationFile = new File(filePath);
-            file.transferTo(destinationFile); // Almacena el archivo en el directorio
+            File destinationFile = new File(directoryPath + File.separator + fileName);
+            file.transferTo(destinationFile);
 
             ObjetoAprendizaje objetoAprendizaje = new ObjetoAprendizaje();
-            objetoAprendizaje.setArchivo(file.getOriginalFilename());
+            objetoAprendizaje.setArchivo(fileName);
             objetoAprendizaje.setFecha(new Date(System.currentTimeMillis()));
 
             ObjetoAprendizaje savedObjetoAprendizaje = objetoAprendizajeRepository.save(objetoAprendizaje);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedObjetoAprendizaje);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("/descargar/{fileName}")
+    public ResponseEntity<FileSystemResource> descargarArchivo(@PathVariable String fileName) {
+        String directoryPath = "C:\\Users\\Administrator\\Documents\\ObjetosDeAprendizaje";
+        File file = new File(directoryPath + File.separator + fileName);
+
+        if (!file.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        FileSystemResource resource = new FileSystemResource(file);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM) // tipo de contenido para archivos binarios
+                .body(resource);
     }
 
     @PutMapping("/{id}")

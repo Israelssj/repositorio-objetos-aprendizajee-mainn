@@ -19,14 +19,14 @@ public class DescargaController {
     @Autowired
     private ObjetoAprendizajeRepository objetoAprendizajeRepository;
 
-    // Obtiene todos los objetos de aprendizaje
+    //  todos los objetos de aprendizaje
     @GetMapping
     public ResponseEntity<List<ObjetoAprendizaje>> findAll() {
         List<ObjetoAprendizaje> objetos = objetoAprendizajeRepository.findAll();
         return ResponseEntity.ok(objetos);
     }
 
-    // Maneja la descarga de un objeto de aprendizaje específico
+
     @GetMapping("/download/{id}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable Integer id) {
         ObjetoAprendizaje objeto = objetoAprendizajeRepository.findById(id).orElse(null);
@@ -35,12 +35,13 @@ public class DescargaController {
         }
         try {
 
-            Path path = Paths.get("ruta/donde/se/guardan/los/archivos/" + objeto.getArchivo());
+            Path path = Paths.get("C:\\Users\\Administrator\\Documents\\ObjetosDeAprendizaje\\" + objeto.getArchivo());
             byte[] data = Files.readAllBytes(path);
             return ResponseEntity.ok()
                     .header("Content-Disposition", "attachment; filename=\"" + objeto.getArchivo() + "\"")
                     .body(data);
         } catch (Exception e) {
+            e.printStackTrace(); // Añadir un log o manejo de errores más robusto
             return ResponseEntity.internalServerError().build();
         }
     }
