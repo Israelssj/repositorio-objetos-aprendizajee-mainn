@@ -41,7 +41,7 @@ public class DescargaController {
                     .header("Content-Disposition", "attachment; filename=\"" + objeto.getArchivo() + "\"")
                     .body(data);
         } catch (Exception e) {
-            e.printStackTrace(); // Añadir un log o manejo de errores más robusto
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }

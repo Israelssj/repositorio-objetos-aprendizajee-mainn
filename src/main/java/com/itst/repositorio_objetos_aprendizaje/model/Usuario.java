@@ -9,16 +9,16 @@ import java.util.List;
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_usuario")  // Cambiado para que coincida con la base de datos
+    @Column(name = "id_usuario")
     private Integer idUsuario;
 
     @Column(name = "nombre", nullable = false, length = 50)
     private String nombreUsuario;
 
-    @Column(name = "ap_paterno", nullable = false, length = 50)  // Cambiado para que coincida con la base de datos
+    @Column(name = "ap_paterno", nullable = false, length = 50)
     private String apellidoPaterno;
 
-    @Column(name = "ap_materno", nullable = false, length = 50)  // Cambiado para que coincida con la base de datos
+    @Column(name = "ap_materno", nullable = false, length = 50)
     private String apellidoMaterno;
 
     @Column(name = "email", nullable = false, length = 100, unique = true)
@@ -28,7 +28,7 @@ public class Usuario {
     private String password;
 
     @ManyToOne
-    @JoinColumn(name = "id_rol", nullable = false)  // Cambiado para que coincida con la base de datos
+    @JoinColumn(name = "id_rol", nullable = false)
     @JsonBackReference
     private Rol rol;
 
