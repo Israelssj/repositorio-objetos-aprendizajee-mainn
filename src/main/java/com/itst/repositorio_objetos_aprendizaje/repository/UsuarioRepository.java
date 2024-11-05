@@ -2,10 +2,10 @@ package com.itst.repositorio_objetos_aprendizaje.repository;
 
 import com.itst.repositorio_objetos_aprendizaje.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-@Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
-
-    Usuario findByEmail(String email);
+    @Query("SELECT u FROM Usuario u JOIN FETCH u.rol WHERE u.email = :email")
+    Usuario findByEmail(@Param("email") String email);
 }

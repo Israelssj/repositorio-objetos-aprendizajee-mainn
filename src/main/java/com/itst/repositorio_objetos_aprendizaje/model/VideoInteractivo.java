@@ -1,5 +1,6 @@
 package com.itst.repositorio_objetos_aprendizaje.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -16,9 +17,11 @@ public class VideoInteractivo {
 
     @ManyToOne
     @JoinColumn(name = "idGuion")
+    @JsonIgnoreProperties("videosInteractivos")
     private Guion guion;
 
     @OneToMany(mappedBy = "videoInteractivo", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("videoInteractivo")
     private List<ElementosVideoInteractivo> elementosVideoInteractivo;
 
     // Constructores

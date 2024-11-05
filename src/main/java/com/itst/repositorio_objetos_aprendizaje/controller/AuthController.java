@@ -26,6 +26,7 @@ public class AuthController {
         }
     }
 
+
     @PostMapping("/register")
     public ResponseEntity<Usuario> register(@RequestBody Usuario newUser) {
         if (usuarioRepository.findByEmail(newUser.getEmail()) != null) {

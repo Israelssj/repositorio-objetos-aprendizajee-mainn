@@ -1,6 +1,6 @@
 package com.itst.repositorio_objetos_aprendizaje.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -10,6 +10,7 @@ public class Guion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_guion")
     private Integer idGuion;
 
     @Column(name = "titulo", length = 50)
@@ -18,150 +19,52 @@ public class Guion {
     @Column(name = "descripcion", length = 50)
     private String descripcion;
 
-    @Column(name = "fechaCreacion", nullable = false)
+    @Column(name = "fecha_creacion", nullable = false)
     private String fechaCreacion;
 
     @Column(name = "materia", length = 50)
     private String materia;
 
-    @Column(name = "nombreDocente", length = 100)
+    @Column(name = "nombre_docente", length = 100)
     private String nombreDocente;
 
-    @Column(name = "nombreMateria", length = 100)
+    @Column(name = "nombre_materia", length = 100)
     private String nombreMateria;
 
-    @Column(name = "nombreTema", length = 100)
+    @Column(name = "nombre_tema", length = 100)
     private String nombreTema;
 
-    @Column(name = "nombreSubtema", length = 100)
+    @Column(name = "nombre_subtema", length = 100)
     private String nombreSubtema;
 
     @Column(name = "semestre", length = 20)
     private String semestre;
 
-
-    @Column(name = "tipoObjeto", length = 50)
+    @Column(name = "tipo_objeto", length = 50)
     private String tipoObjeto;
 
-
-    @Column(name = "objetoAprendizaje", columnDefinition = "TEXT")
+    @Column(name = "objeto_aprendizaje", columnDefinition = "TEXT")
     private String objetoAprendizaje;
 
+    @Column(name = "estado", nullable = false, length = 20)
+    private String estado = "pendiente"; // Estados posibles: "pendiente", "aprobado", "denegado"
+
+    @Column(name = "observacion", columnDefinition = "TEXT")
+    private String observacion;
+
 
     @OneToMany(mappedBy = "guion", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("guion") // Ignorar la referencia inversa para evitar ciclos
     private List<VideoInteractivo> videosInteractivos;
 
-    @OneToMany(mappedBy = "guion", cascade = CascadeType.ALL)
-    private List<Crucigrama> crucigramas;
+    // Getters y Setters
 
-    @OneToMany(mappedBy = "guion", cascade = CascadeType.ALL)
-    private List<ArrastrarPalabras> arrastrarPalabras;
-
-    @OneToMany(mappedBy = "guion", cascade = CascadeType.ALL)
-    private List<Cuestionario> cuestionarios;
-
-    @OneToMany(mappedBy = "guion", cascade = CascadeType.ALL)
-    private List<PresentacionCurso> presentacionesCurso;
-
-    @OneToMany(mappedBy = "guion", cascade = CascadeType.ALL)
-    private List<EleccionMultiple> eleccionesMultiples;
-
-    // Getters y setters
-
-    public Integer getIdGuion() {
-        return idGuion;
+    public String getEstado() {
+        return estado;
     }
 
-    public void setIdGuion(Integer idGuion) {
-        this.idGuion = idGuion;
-    }
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public String getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(String fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
-
-    public String getMateria() {
-        return materia;
-    }
-
-    public void setMateria(String materia) {
-        this.materia = materia;
-    }
-
-    public String getNombreDocente() {
-        return nombreDocente;
-    }
-
-    public void setNombreDocente(String nombreDocente) {
-        this.nombreDocente = nombreDocente;
-    }
-
-    public String getNombreMateria() {
-        return nombreMateria;
-    }
-
-    public void setNombreMateria(String nombreMateria) {
-        this.nombreMateria = nombreMateria;
-    }
-
-    public String getNombreTema() {
-        return nombreTema;
-    }
-
-    public void setNombreTema(String nombreTema) {
-        this.nombreTema = nombreTema;
-    }
-
-    public String getNombreSubtema() {
-        return nombreSubtema;
-    }
-
-    public void setNombreSubtema(String nombreSubtema) {
-        this.nombreSubtema = nombreSubtema;
-    }
-
-    public String getSemestre() {
-        return semestre;
-    }
-
-    public void setSemestre(String semestre) {
-        this.semestre = semestre;
-    }
-
-    public String getTipoObjeto() {
-        return tipoObjeto;
-    }
-
-    public void setTipoObjeto(String tipoObjeto) {
-        this.tipoObjeto = tipoObjeto;
-    }
-
-    public String getObjetoAprendizaje() {
-        return objetoAprendizaje;
-    }
-
-    public void setObjetoAprendizaje(String objetoAprendizaje) {
-        this.objetoAprendizaje = objetoAprendizaje;
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
     public List<VideoInteractivo> getVideosInteractivos() {
@@ -172,43 +75,107 @@ public class Guion {
         this.videosInteractivos = videosInteractivos;
     }
 
-    public List<Crucigrama> getCrucigramas() {
-        return crucigramas;
+    public String getObservacion() {
+        return observacion;
     }
 
-    public void setCrucigramas(List<Crucigrama> crucigramas) {
-        this.crucigramas = crucigramas;
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
     }
 
-    public List<ArrastrarPalabras> getArrastrarPalabras() {
-        return arrastrarPalabras;
+    public String getObjetoAprendizaje() {
+        return objetoAprendizaje;
     }
 
-    public void setArrastrarPalabras(List<ArrastrarPalabras> arrastrarPalabras) {
-        this.arrastrarPalabras = arrastrarPalabras;
+    public void setObjetoAprendizaje(String objetoAprendizaje) {
+        this.objetoAprendizaje = objetoAprendizaje;
     }
 
-    public List<Cuestionario> getCuestionarios() {
-        return cuestionarios;
+    public String getTipoObjeto() {
+        return tipoObjeto;
     }
 
-    public void setCuestionarios(List<Cuestionario> cuestionarios) {
-        this.cuestionarios = cuestionarios;
+    public void setTipoObjeto(String tipoObjeto) {
+        this.tipoObjeto = tipoObjeto;
     }
 
-    public List<PresentacionCurso> getPresentacionesCurso() {
-        return presentacionesCurso;
+    public String getSemestre() {
+        return semestre;
     }
 
-    public void setPresentacionesCurso(List<PresentacionCurso> presentacionesCurso) {
-        this.presentacionesCurso = presentacionesCurso;
+    public void setSemestre(String semestre) {
+        this.semestre = semestre;
     }
 
-    public List<EleccionMultiple> getEleccionesMultiples() {
-        return eleccionesMultiples;
+    public String getNombreSubtema() {
+        return nombreSubtema;
     }
 
-    public void setEleccionesMultiples(List<EleccionMultiple> eleccionesMultiples) {
-        this.eleccionesMultiples = eleccionesMultiples;
+    public void setNombreSubtema(String nombreSubtema) {
+        this.nombreSubtema = nombreSubtema;
+    }
+
+    public String getNombreTema() {
+        return nombreTema;
+    }
+
+    public void setNombreTema(String nombreTema) {
+        this.nombreTema = nombreTema;
+    }
+
+    public String getNombreMateria() {
+        return nombreMateria;
+    }
+
+    public void setNombreMateria(String nombreMateria) {
+        this.nombreMateria = nombreMateria;
+    }
+
+    public String getNombreDocente() {
+        return nombreDocente;
+    }
+
+    public void setNombreDocente(String nombreDocente) {
+        this.nombreDocente = nombreDocente;
+    }
+
+    public String getMateria() {
+        return materia;
+    }
+
+    public void setMateria(String materia) {
+        this.materia = materia;
+    }
+
+    public String getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(String fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public Integer getIdGuion() {
+        return idGuion;
+    }
+
+    public void setIdGuion(Integer idGuion) {
+        this.idGuion = idGuion;
     }
 }

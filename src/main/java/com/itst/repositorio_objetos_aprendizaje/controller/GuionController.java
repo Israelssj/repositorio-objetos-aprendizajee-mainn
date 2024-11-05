@@ -22,13 +22,17 @@ public class GuionController {
         this.guionRepository = guionRepository;
     }
 
-
     @GetMapping
     public ResponseEntity<List<Guion>> getAllGuiones() {
         List<Guion> guiones = guionRepository.findAll();
         return new ResponseEntity<>(guiones, HttpStatus.OK);
     }
 
+    @GetMapping("/pendientes")
+    public ResponseEntity<List<Guion>> getGuionesPendientes() {
+        List<Guion> guionesPendientes = guionRepository.findByEstado("pendiente");
+        return new ResponseEntity<>(guionesPendientes, HttpStatus.OK);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Guion> getGuionById(@PathVariable Integer id) {
@@ -36,7 +40,6 @@ public class GuionController {
         return guionOptional.map(guion -> new ResponseEntity<>(guion, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
 
     @PostMapping
     public ResponseEntity<Guion> createGuion(@RequestBody Guion guion) {
@@ -47,8 +50,6 @@ public class GuionController {
         Guion nuevoGuion = guionRepository.save(guion);
         return new ResponseEntity<>(nuevoGuion, HttpStatus.CREATED);
     }
-
-
 
     @PutMapping("/{id}")
     public ResponseEntity<Guion> updateGuion(@PathVariable Integer id, @RequestBody Guion guionActualizado) {
@@ -70,6 +71,32 @@ public class GuionController {
         }
     }
 
+    @PostMapping("/aprobar/{id}")
+    public ResponseEntity<Void> aprobarGuion(@PathVariable Integer id) {
+        Optional<Guion> guionOptional = guionRepository.findById(id);
+        if (guionOptional.isPresent()) {
+            Guion guion = guionOptional.get();
+            guion.setEstado("aprobado");
+            guionRepository.save(guion);
+            return ResponseEntity.ok().build();
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/denegar/{id}")
+    public ResponseEntity<Void> denegarGuion(@PathVariable Integer id, @RequestBody String observacion) {
+        Optional<Guion> guionOptional = guionRepository.findById(id);
+        if (guionOptional.isPresent()) {
+            Guion guion = guionOptional.get();
+            guion.setEstado("denegado");
+            guion.setObservacion(observacion);
+            guionRepository.save(guion);
+            return ResponseEntity.ok().build();
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGuion(@PathVariable Integer id) {
