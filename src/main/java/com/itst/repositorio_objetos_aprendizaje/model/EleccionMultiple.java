@@ -1,7 +1,8 @@
 package com.itst.repositorio_objetos_aprendizaje.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-
 import java.util.List;
 
 @Entity
@@ -12,21 +13,14 @@ public class EleccionMultiple {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idEleccionMultiple;
 
-    @ManyToOne
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idGuion")
     private Guion guion;
 
-    @OneToMany(mappedBy = "eleccionMultiple", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @OneToMany(mappedBy = "eleccionMultiple", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ElementosEleccionMultiple> elementosEleccionMultiple;
-
-    // Constructores
-    public EleccionMultiple() {
-        // Constructor vacío necesario para JPA
-    }
-
-    public EleccionMultiple(Guion guion) {
-        this.guion = guion;
-    }
 
     // Getters y Setters
     public Integer getIdEleccionMultiple() {
@@ -37,19 +31,19 @@ public class EleccionMultiple {
         this.idEleccionMultiple = idEleccionMultiple;
     }
 
-    public Guion getGuion() {
-        return guion;
-    }
-
-    public void setGuion(Guion guion) {
-        this.guion = guion;
-    }
-
     public List<ElementosEleccionMultiple> getElementosEleccionMultiple() {
         return elementosEleccionMultiple;
     }
 
     public void setElementosEleccionMultiple(List<ElementosEleccionMultiple> elementosEleccionMultiple) {
         this.elementosEleccionMultiple = elementosEleccionMultiple;
+    }
+
+    public Guion getGuion() {
+        return guion;
+    }
+
+    public void setGuion(Guion guion) {
+        this.guion = guion;
     }
 }

@@ -1,12 +1,15 @@
 package com.itst.repositorio_objetos_aprendizaje.controller;
 
 import com.itst.repositorio_objetos_aprendizaje.model.Guion;
+import com.itst.repositorio_objetos_aprendizaje.model.Usuario;
 import com.itst.repositorio_objetos_aprendizaje.repository.GuionRepository;
+import com.itst.repositorio_objetos_aprendizaje.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,10 +19,12 @@ import java.util.Optional;
 public class GuionController {
 
     private final GuionRepository guionRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Autowired
-    public GuionController(GuionRepository guionRepository) {
+    public GuionController(GuionRepository guionRepository, UsuarioRepository usuarioRepository) {
         this.guionRepository = guionRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @GetMapping
@@ -34,6 +39,12 @@ public class GuionController {
         return new ResponseEntity<>(guionesPendientes, HttpStatus.OK);
     }
 
+    @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<List<Guion>> getGuionesByUsuarioId(@PathVariable Integer idUsuario) {
+        List<Guion> guionesUsuario = guionRepository.findByUsuario_IdUsuario(idUsuario);
+        return new ResponseEntity<>(guionesUsuario, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Guion> getGuionById(@PathVariable Integer id) {
         Optional<Guion> guionOptional = guionRepository.findById(id);
@@ -43,13 +54,21 @@ public class GuionController {
 
     @PostMapping
     public ResponseEntity<Guion> createGuion(@RequestBody Guion guion) {
-        if (guion.getTitulo() == null || guion.getDescripcion() == null) {
-            return ResponseEntity.badRequest().build();
+        if (guion.getTitulo() == null || guion.getDescripcion() == null || guion.getUsuario() == null || guion.getUsuario().getIdUsuario() == null) {
+            return ResponseEntity.badRequest().body(null);
         }
 
+        Optional<Usuario> usuarioOptional = usuarioRepository.findById(guion.getUsuario().getIdUsuario());
+        if (!usuarioOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        guion.setUsuario(usuarioOptional.get());
+        guion.setFechaCreacion(LocalDate.now().toString());
         Guion nuevoGuion = guionRepository.save(guion);
-        return new ResponseEntity<>(nuevoGuion, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoGuion);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Guion> updateGuion(@PathVariable Integer id, @RequestBody Guion guionActualizado) {

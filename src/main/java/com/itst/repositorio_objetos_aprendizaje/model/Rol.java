@@ -1,12 +1,14 @@
 package com.itst.repositorio_objetos_aprendizaje.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "rol")
+@JsonIgnoreProperties(value = {"usuarios"}, allowSetters = true)
 public class Rol {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_rol")
@@ -19,8 +21,10 @@ public class Rol {
     private String descripcion;
 
     @OneToMany(mappedBy = "rol", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonIgnoreProperties(value = {"rol", "guiones"}, allowSetters = true)
+
     private List<Usuario> usuarios;
+
     // Constructor vacío
     public Rol() {}
 
@@ -31,6 +35,7 @@ public class Rol {
     }
 
     // Getters y Setters
+
     public Integer getIdRol() {
         return idRol;
     }
@@ -39,20 +44,20 @@ public class Rol {
         this.idRol = idRol;
     }
 
-    public String getNombreRol() {
-        return nombreRol;
-    }
-
-    public void setNombreRol(String nombreRol) {
-        this.nombreRol = nombreRol;
-    }
-
     public String getDescripcion() {
         return descripcion;
     }
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public String getNombreRol() {
+        return nombreRol;
+    }
+
+    public void setNombreRol(String nombreRol) {
+        this.nombreRol = nombreRol;
     }
 
     public List<Usuario> getUsuarios() {

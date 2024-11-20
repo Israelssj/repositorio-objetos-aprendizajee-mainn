@@ -1,5 +1,6 @@
 package com.itst.repositorio_objetos_aprendizaje.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,19 +11,19 @@ public class RespuestaEleccionMultiple {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idRespuestaEleccionMultiple;
 
-    @Column(name = "textoRespuesta")
+    @Column(name = "textoRespuesta", columnDefinition = "TEXT")
     private String textoRespuesta;
 
     @Column(name = "correcta")
     private Boolean correcta;
 
-    @ManyToOne
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idElementosEleccionMultiple")
     private ElementosEleccionMultiple elementosEleccionMultiple;
 
     // Constructores
     public RespuestaEleccionMultiple() {
-        // Constructor vacío necesario para JPA
     }
 
     public RespuestaEleccionMultiple(String textoRespuesta, Boolean correcta, ElementosEleccionMultiple elementosEleccionMultiple) {

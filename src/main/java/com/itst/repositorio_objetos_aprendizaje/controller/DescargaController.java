@@ -34,7 +34,7 @@ public class DescargaController {
             return ResponseEntity.notFound().build();
         }
         try {
-
+            // PONER DONDE SE VAN A GUARDAR LOS ARCHIVOS H5P
             Path path = Paths.get("C:\\Users\\Administrator\\Documents\\ObjetosDeAprendizaje\\" + objeto.getArchivo());
             byte[] data = Files.readAllBytes(path);
             return ResponseEntity.ok()
