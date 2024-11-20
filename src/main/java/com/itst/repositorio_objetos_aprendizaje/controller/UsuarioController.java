@@ -1,13 +1,11 @@
 package com.itst.repositorio_objetos_aprendizaje.controller;
 
 import com.itst.repositorio_objetos_aprendizaje.model.Usuario;
-import com.itst.repositorio_objetos_aprendizaje.repository.UsuarioRepository;
+import com.itst.repositorio_objetos_aprendizaje.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.util.Optional;
 
 @RestController
@@ -15,64 +13,92 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:3000")
 public class UsuarioController {
 
+    private final UsuarioService usuarioService;
+
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody Usuario newUsuario) {
+        if (newUsuario.getRol() == null || newUsuario.getRol().getIdRol() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El rol del usuario es obligatorio.");
+        }
+
+        if (newUsuario.getEmail() == null || newUsuario.getEmail().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El correo del usuario es obligatorio.");
+        }
+
+        if (newUsuario.getPassword() == null || newUsuario.getPassword().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La contraseña del usuario es obligatoria.");
+        }
+
+        try {
+            Usuario savedUsuario = usuarioService.registerUsuario(newUsuario);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUsuario);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al crear el usuario: " + e.getMessage());
+        }
+    }
 
     @GetMapping
     public ResponseEntity<?> findAll() {
         try {
-            return ResponseEntity.ok(usuarioRepository.findAll());
+            return ResponseEntity.ok(usuarioService.findAll());
         } catch (Exception e) {
-            System.err.println("Error en findAll: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al obtener los usuarios: " + e.getMessage());
         }
     }
 
-
     @GetMapping("/{idUsuario}")
-    public ResponseEntity<Usuario> findById(@PathVariable Integer idUsuario) {
-        Optional<Usuario> usuarioOptional = usuarioRepository.findById(idUsuario);
-        return usuarioOptional.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Usuario> create(@RequestBody Usuario newUsuario) {
-        if (newUsuario.getRol() == null || newUsuario.getRol().getIdRol() == null) {
-            return ResponseEntity.badRequest().body(null);
-        }
-
-        if (newUsuario.getEmail() == null || newUsuario.getPassword() == null) {
-            return ResponseEntity.badRequest().body(null);
-        }
-
+    public ResponseEntity<?> findById(@PathVariable Integer idUsuario) {
         try {
-            Usuario savedUsuario = usuarioRepository.save(newUsuario);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedUsuario);
+            Optional<Usuario> usuarioOptional = usuarioService.findById(idUsuario);
+            if (usuarioOptional.isPresent()) {
+                return ResponseEntity.ok(usuarioOptional.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado.");
+            }
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al crear el usuario", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al buscar el usuario: " + e.getMessage());
         }
     }
 
-    @PutMapping(value = "/{idUsuario}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Usuario> update(@PathVariable Integer idUsuario, @RequestBody Usuario updatedUsuario) {
-        Optional<Usuario> existingUsuario = usuarioRepository.findById(idUsuario);
-        if (existingUsuario.isPresent()) {
-            updatedUsuario.setIdUsuario(existingUsuario.get().getIdUsuario());
-            Usuario savedUsuario = usuarioRepository.save(updatedUsuario);
-            return ResponseEntity.ok(savedUsuario);
+    @PutMapping("/{idUsuario}")
+    public ResponseEntity<?> update(@PathVariable Integer idUsuario, @RequestBody Usuario updatedUsuario) {
+        try {
+            Optional<Usuario> existingUsuario = usuarioService.findById(idUsuario);
+            if (existingUsuario.isPresent()) {
+                updatedUsuario.setIdUsuario(existingUsuario.get().getIdUsuario());
+                Usuario savedUsuario = usuarioService.saveOrUpdate(updatedUsuario);
+                return ResponseEntity.ok(savedUsuario);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al actualizar el usuario: " + e.getMessage());
         }
-        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{idUsuario}")
-    public ResponseEntity<Void> delete(@PathVariable Integer idUsuario) {
-        if (usuarioRepository.existsById(idUsuario)) {
-            usuarioRepository.deleteById(idUsuario);
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<?> delete(@PathVariable Integer idUsuario) {
+        try {
+            if (usuarioService.existsById(idUsuario)) {
+                usuarioService.deleteById(idUsuario);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al eliminar el usuario: " + e.getMessage());
         }
-        return ResponseEntity.notFound().build();
     }
 }

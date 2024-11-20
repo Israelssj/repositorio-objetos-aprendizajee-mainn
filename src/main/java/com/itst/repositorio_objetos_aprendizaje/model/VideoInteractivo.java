@@ -1,11 +1,13 @@
 package com.itst.repositorio_objetos_aprendizaje.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "videointeractivo")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "idVideoInteractivo")
 public class VideoInteractivo {
 
     @Id
@@ -15,23 +17,12 @@ public class VideoInteractivo {
     @Column(name = "urlVideo", length = 255)
     private String urlVideo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idGuion")
-    @JsonIgnoreProperties("videosInteractivos")
     private Guion guion;
 
-    @OneToMany(mappedBy = "videoInteractivo", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties("videoInteractivo")
+    @OneToMany(mappedBy = "videoInteractivo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ElementosVideoInteractivo> elementosVideoInteractivo;
-
-    // Constructores
-    public VideoInteractivo() {
-    }
-
-    public VideoInteractivo(String urlVideo, Guion guion) {
-        this.urlVideo = urlVideo;
-        this.guion = guion;
-    }
 
     // Getters y Setters
     public Integer getIdVideoInteractivo() {

@@ -8,5 +8,8 @@ import java.util.List;
 
 @Repository
 public interface GuionRepository extends JpaRepository<Guion, Integer> {
-    List<Guion> findByEstado(String pendiente);
+    List<Guion> findByEstado(String estado);
+
+
+    List<Guion> findByUsuario_IdUsuario(Integer idUsuario);
 }

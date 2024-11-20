@@ -1,7 +1,8 @@
 package com.itst.repositorio_objetos_aprendizaje.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-
 import java.util.List;
 
 @Entity
@@ -15,16 +16,17 @@ public class ElementosEleccionMultiple {
     @Column(name = "pregunta", columnDefinition = "TEXT")
     private String pregunta;
 
-    @ManyToOne
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idEleccionMultiple")
     private EleccionMultiple eleccionMultiple;
 
-    @OneToMany(mappedBy = "elementosEleccionMultiple", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @OneToMany(mappedBy = "elementosEleccionMultiple", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RespuestaEleccionMultiple> respuestas;
 
     // Constructores
     public ElementosEleccionMultiple() {
-        // Constructor vacío necesario para JPA
     }
 
     public ElementosEleccionMultiple(String pregunta, EleccionMultiple eleccionMultiple) {

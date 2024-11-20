@@ -1,13 +1,15 @@
 package com.itst.repositorio_objetos_aprendizaje.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-
 import java.util.List;
 
 @Entity
 @Table(name = "arrastarpalabras")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "idArrastarPalabras")
 public class ArrastrarPalabras {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idArrastarPalabras;
@@ -15,31 +17,14 @@ public class ArrastrarPalabras {
     @Column(name = "textoBase", columnDefinition = "TEXT")
     private String textoBase;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idGuion")
     private Guion guion;
 
-    @OneToMany(mappedBy = "arrastrarPalabras", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "arrastrarPalabras", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ElementosArrastrarPalabras> elementosArrastrarPalabras;
 
-
-    public ArrastrarPalabras() {
-
-    }
-
-    public ArrastrarPalabras(String textoBase, Guion guion) {
-        this.textoBase = textoBase;
-        this.guion = guion;
-    }
-
     // Getters y Setters
-    public Integer getIdArrastarPalabras() {
-        return idArrastarPalabras;
-    }
-
-    public void setIdArrastarPalabras(Integer idArrastarPalabras) {
-        this.idArrastarPalabras = idArrastarPalabras;
-    }
 
     public String getTextoBase() {
         return textoBase;
@@ -47,6 +32,14 @@ public class ArrastrarPalabras {
 
     public void setTextoBase(String textoBase) {
         this.textoBase = textoBase;
+    }
+
+    public Integer getIdArrastarPalabras() {
+        return idArrastarPalabras;
+    }
+
+    public void setIdArrastarPalabras(Integer idArrastarPalabras) {
+        this.idArrastarPalabras = idArrastarPalabras;
     }
 
     public Guion getGuion() {

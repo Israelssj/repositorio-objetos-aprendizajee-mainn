@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/respuestas-cuestionario")
@@ -21,53 +20,49 @@ public class RespuestaCuestionarioController {
         this.respuestaCuestionarioRepository = respuestaCuestionarioRepository;
     }
 
-
     @GetMapping
     public ResponseEntity<List<RespuestaCuestionario>> getAllRespuestasCuestionario() {
         List<RespuestaCuestionario> respuestasCuestionario = respuestaCuestionarioRepository.findAll();
-        return new ResponseEntity<>(respuestasCuestionario, HttpStatus.OK);
+        return ResponseEntity.ok(respuestasCuestionario);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<RespuestaCuestionario> getRespuestaCuestionarioById(@PathVariable Integer id) {
-        Optional<RespuestaCuestionario> respuestaCuestionarioOptional = respuestaCuestionarioRepository.findById(id);
-        return respuestaCuestionarioOptional.map(respuestaCuestionario -> new ResponseEntity<>(respuestaCuestionario, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return respuestaCuestionarioRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-
 
     @PostMapping
     public ResponseEntity<RespuestaCuestionario> createRespuestaCuestionario(@RequestBody RespuestaCuestionario respuestaCuestionario) {
-        RespuestaCuestionario nuevaRespuestaCuestionario = respuestaCuestionarioRepository.save(respuestaCuestionario);
-        return new ResponseEntity<>(nuevaRespuestaCuestionario, HttpStatus.CREATED);
+        if (respuestaCuestionario.getTexto() == null || respuestaCuestionario.getTexto().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        RespuestaCuestionario nuevaRespuesta = respuestaCuestionarioRepository.save(respuestaCuestionario);
+        return new ResponseEntity<>(nuevaRespuesta, HttpStatus.CREATED);
     }
-
 
     @PutMapping("/{id}")
-    public ResponseEntity<RespuestaCuestionario> updateRespuestaCuestionario(@PathVariable Integer id, @RequestBody RespuestaCuestionario respuestaCuestionarioActualizado) {
-        Optional<RespuestaCuestionario> respuestaCuestionarioOptional = respuestaCuestionarioRepository.findById(id);
-        if (respuestaCuestionarioOptional.isPresent()) {
-            RespuestaCuestionario respuestaCuestionarioExistente = respuestaCuestionarioOptional.get();
-            respuestaCuestionarioExistente.setTexto(respuestaCuestionarioActualizado.getTexto());
-            respuestaCuestionarioExistente.setElementosCuestionario(respuestaCuestionarioActualizado.getElementosCuestionario());
-
-            RespuestaCuestionario respuestaCuestionarioActualizadoDB = respuestaCuestionarioRepository.save(respuestaCuestionarioExistente);
-            return new ResponseEntity<>(respuestaCuestionarioActualizadoDB, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<RespuestaCuestionario> updateRespuestaCuestionario(
+            @PathVariable Integer id, @RequestBody RespuestaCuestionario respuestaActualizada) {
+        return respuestaCuestionarioRepository.findById(id)
+                .map(respuestaExistente -> {
+                    respuestaExistente.setTexto(respuestaActualizada.getTexto());
+                    respuestaExistente.setCorrecta(respuestaActualizada.getCorrecta());
+                    respuestaExistente.setElementosCuestionario(respuestaActualizada.getElementosCuestionario());
+                    RespuestaCuestionario actualizada = respuestaCuestionarioRepository.save(respuestaExistente);
+                    return ResponseEntity.ok(actualizada);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRespuestaCuestionario(@PathVariable Integer id) {
-        Optional<RespuestaCuestionario> respuestaCuestionarioOptional = respuestaCuestionarioRepository.findById(id);
-        if (respuestaCuestionarioOptional.isPresent()) {
-            respuestaCuestionarioRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Object> deleteRespuestaCuestionario(@PathVariable Integer id) {
+        return respuestaCuestionarioRepository.findById(id)
+                .map(respuesta -> {
+                    respuestaCuestionarioRepository.deleteById(id);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }

@@ -1,5 +1,6 @@
 package com.itst.repositorio_objetos_aprendizaje.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,46 +11,24 @@ public class RespuestaCuestionario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idRespuestaCuestionario;
 
-    @Column(name = "texto", columnDefinition = "TEXT")
+    @Column(name = "texto", columnDefinition = "TEXT", nullable = false)
     private String texto;
 
-    @ManyToOne
-    @JoinColumn(name = "idElementosCuestionario")
+    @Column(name = "correcta", nullable = false)
+    private Boolean correcta;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_elementos_cuestionario")
+    @JsonBackReference
     private ElementosCuestionario elementosCuestionario;
 
-    // Constructores
-    public RespuestaCuestionario() {
-        // Constructor vacío necesario para JPA
-    }
-
-    public RespuestaCuestionario(String texto, ElementosCuestionario elementosCuestionario) {
-        this.texto = texto;
-        this.elementosCuestionario = elementosCuestionario;
-    }
-
-
     // Getters y Setters
-    public Integer getIdRespuestaCuestionario() {
-        return idRespuestaCuestionario;
-    }
-
-    public void setIdRespuestaCuestionario(Integer idRespuestaCuestionario) {
-        this.idRespuestaCuestionario = idRespuestaCuestionario;
-    }
-
-    public String getTexto() {
-        return texto;
-    }
-
-    public void setTexto(String texto) {
-        this.texto = texto;
-    }
-
-    public ElementosCuestionario getElementosCuestionario() {
-        return elementosCuestionario;
-    }
-
-    public void setElementosCuestionario(ElementosCuestionario elementosCuestionario) {
-        this.elementosCuestionario = elementosCuestionario;
-    }
+    public Integer getIdRespuestaCuestionario() { return idRespuestaCuestionario; }
+    public void setIdRespuestaCuestionario(Integer idRespuestaCuestionario) { this.idRespuestaCuestionario = idRespuestaCuestionario; }
+    public String getTexto() { return texto; }
+    public void setTexto(String texto) { this.texto = texto; }
+    public Boolean getCorrecta() { return correcta; }
+    public void setCorrecta(Boolean correcta) { this.correcta = correcta; }
+    public ElementosCuestionario getElementosCuestionario() { return elementosCuestionario; }
+    public void setElementosCuestionario(ElementosCuestionario elementosCuestionario) { this.elementosCuestionario = elementosCuestionario; }
 }

@@ -16,7 +16,7 @@ public class Evaluacion {
     @Column(name = "comentario", columnDefinition = "TEXT")
     private String comentario;
 
-    // Relación bidireccional con ObjetoAprendizaje
+
     @OneToOne(mappedBy = "evaluacion", cascade = CascadeType.ALL)
     @JsonIgnore
     private ObjetoAprendizaje objetoAprendizaje;
