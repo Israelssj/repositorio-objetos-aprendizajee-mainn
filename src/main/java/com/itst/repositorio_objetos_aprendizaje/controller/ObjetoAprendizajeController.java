@@ -46,7 +46,7 @@ public class ObjetoAprendizajeController {
         return objetoAprendizaje.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Crear un nuevo objeto de aprendizaje asociado a un guion aprobado
+    // Crear un  objeto aprobado
     @PostMapping(value = "/", consumes = {"multipart/form-data"})
     public ResponseEntity<?> createObjetoAprendizaje(
             @RequestParam("file") MultipartFile file,
@@ -64,7 +64,7 @@ public class ObjetoAprendizajeController {
 
             Guion guion = optionalGuion.get();
 
-            // Verificar que el Guion esté en estado "aprobado"
+            // Verificar que el Guion est en estado "aprobado"
             if (!"aprobado".equalsIgnoreCase(guion.getEstado())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("El guion seleccionado no está en estado 'aprobado'.");
