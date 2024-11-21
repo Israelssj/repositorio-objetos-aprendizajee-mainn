@@ -39,6 +39,12 @@ public class GuionController {
         return new ResponseEntity<>(guionesPendientes, HttpStatus.OK);
     }
 
+    @GetMapping("/aprobados")
+    public ResponseEntity<List<Guion>> getGuionesAprobados() {
+        List<Guion> guionesAprobados = guionRepository.findByEstado("aprobado");
+        return new ResponseEntity<>(guionesAprobados, HttpStatus.OK);
+    }
+
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<List<Guion>> getGuionesByUsuarioId(@PathVariable Integer idUsuario) {
         List<Guion> guionesUsuario = guionRepository.findByUsuario_IdUsuario(idUsuario);
@@ -78,7 +84,6 @@ public class GuionController {
             guionExistente.setTitulo(guionActualizado.getTitulo());
             guionExistente.setDescripcion(guionActualizado.getDescripcion());
             guionExistente.setFechaCreacion(guionActualizado.getFechaCreacion());
-            guionExistente.setMateria(guionActualizado.getMateria());
             guionExistente.setNombreDocente(guionActualizado.getNombreDocente());
             guionExistente.setTipoObjeto(guionActualizado.getTipoObjeto());
             guionExistente.setObjetoAprendizaje(guionActualizado.getObjetoAprendizaje());

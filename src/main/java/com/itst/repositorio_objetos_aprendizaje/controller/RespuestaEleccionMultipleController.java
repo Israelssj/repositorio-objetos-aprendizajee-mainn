@@ -60,7 +60,7 @@ public class RespuestaEleccionMultipleController {
         }
     }
 
-    // Eliminar una respuesta de elección múltiple por su ID
+    // Eliminar una respuesta de elección  por su ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRespuestaEleccionMultiple(@PathVariable Integer id) {
         Optional<RespuestaEleccionMultiple> respuestaEleccionMultipleOptional = respuestaEleccionMultipleRepository.findById(id);

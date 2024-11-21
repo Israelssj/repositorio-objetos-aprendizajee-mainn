@@ -1,6 +1,8 @@
 package com.itst.repositorio_objetos_aprendizaje.controller;
 
+import com.itst.repositorio_objetos_aprendizaje.model.Guion;
 import com.itst.repositorio_objetos_aprendizaje.model.ObjetoAprendizaje;
+import com.itst.repositorio_objetos_aprendizaje.repository.GuionRepository;
 import com.itst.repositorio_objetos_aprendizaje.repository.ObjetoAprendizajeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -23,10 +25,12 @@ import java.util.Optional;
 public class ObjetoAprendizajeController {
 
     private final ObjetoAprendizajeRepository objetoAprendizajeRepository;
+    private final GuionRepository guionRepository;
 
     @Autowired
-    public ObjetoAprendizajeController(ObjetoAprendizajeRepository objetoAprendizajeRepository) {
+    public ObjetoAprendizajeController(ObjetoAprendizajeRepository objetoAprendizajeRepository, GuionRepository guionRepository) {
         this.objetoAprendizajeRepository = objetoAprendizajeRepository;
+        this.guionRepository = guionRepository;
     }
 
     // Obtener todos los objetos de aprendizaje
@@ -42,18 +46,31 @@ public class ObjetoAprendizajeController {
         return objetoAprendizaje.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Crear un nuevo objeto de aprendizaje
+    // Crear un nuevo objeto de aprendizaje asociado a un guion aprobado
     @PostMapping(value = "/", consumes = {"multipart/form-data"})
-    public ResponseEntity<?> createObjetoAprendizaje(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> createObjetoAprendizaje(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("idGuion") Integer idGuion) {
         try {
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest().body("El archivo está vacío.");
             }
-            if (!file.getContentType().equals("application/zip")) {
-                return ResponseEntity.badRequest().body("El archivo no tiene un formato válido (debe ser .h5p).");
+
+            // Buscar el Guion por ID
+            Optional<Guion> optionalGuion = guionRepository.findById(idGuion);
+            if (optionalGuion.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Guion no encontrado.");
             }
 
-            // Generar un nombre único para evitar conflictos
+            Guion guion = optionalGuion.get();
+
+            // Verificar que el Guion esté en estado "aprobado"
+            if (!"aprobado".equalsIgnoreCase(guion.getEstado())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("El guion seleccionado no está en estado 'aprobado'.");
+            }
+
+
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             String directoryPath = "C:\\Users\\Administrator\\Documents\\ObjetosDeAprendizaje";
             File destinationFile = new File(directoryPath + File.separator + fileName);
@@ -62,8 +79,15 @@ public class ObjetoAprendizajeController {
             ObjetoAprendizaje objetoAprendizaje = new ObjetoAprendizaje();
             objetoAprendizaje.setArchivo(fileName);
             objetoAprendizaje.setFecha(new Date(System.currentTimeMillis()));
+            objetoAprendizaje.setGuion(guion);
+
 
             ObjetoAprendizaje savedObjetoAprendizaje = objetoAprendizajeRepository.save(objetoAprendizaje);
+
+            // estado del Guion a "publicado"
+            guion.setEstado("publicado");
+            guionRepository.save(guion);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(savedObjetoAprendizaje);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -107,6 +131,7 @@ public class ObjetoAprendizajeController {
         ObjetoAprendizaje objetoAprendizaje = optionalObjetoAprendizaje.get();
         objetoAprendizaje.setArchivo(objetoAprendizajeDetails.getArchivo());
         objetoAprendizaje.setFecha(objetoAprendizajeDetails.getFecha());
+
         ObjetoAprendizaje updatedObjetoAprendizaje = objetoAprendizajeRepository.save(objetoAprendizaje);
         return ResponseEntity.ok(updatedObjetoAprendizaje);
     }

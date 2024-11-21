@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/rol")
-@CrossOrigin(origins = "http://localhost:3000") // Configura el CORS
+@CrossOrigin(origins = "http://localhost:3000")
 public class RolController {
 
     @Autowired

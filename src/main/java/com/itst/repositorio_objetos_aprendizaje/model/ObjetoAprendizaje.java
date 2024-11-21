@@ -17,7 +17,7 @@ public class ObjetoAprendizaje {
     @Column(name = "fecha", nullable = false)
     private java.sql.Date fecha;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idGuion")
     private Guion guion;
 

@@ -15,17 +15,14 @@ public class Guion {
     @Column(name = "id_guion")
     private Integer idGuion;
 
-    @Column(name = "titulo", length = 50)
+    @Column(name = "titulo", length = 100)
     private String titulo;
 
-    @Column(name = "descripcion", length = 50)
+    @Column(name = "descripcion", length = 250)
     private String descripcion;
 
     @Column(name = "fecha_creacion", nullable = false)
     private String fechaCreacion;
-
-    @Column(name = "materia", length = 50)
-    private String materia;
 
     @Column(name = "nombre_docente", length = 100)
     private String nombreDocente;
@@ -107,14 +104,6 @@ public class Guion {
 
     public void setFechaCreacion(String fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
-    }
-
-    public String getMateria() {
-        return materia;
-    }
-
-    public void setMateria(String materia) {
-        this.materia = materia;
     }
 
     public String getNombreDocente() {
